@@ -3,4 +3,3 @@
 
 class Base(DeclarativeBase):
     pass
-

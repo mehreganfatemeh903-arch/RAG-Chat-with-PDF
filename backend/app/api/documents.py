@@ -10,6 +10,10 @@ from app.core.dependencies import get_current_user
 from app.db.models import User, Document
 from app.db.session import get_db
 from app.rag.ingestion import DocumentIngestionService
+from io import BytesIO
+from pypdf import PdfReader
+
+from app.analyzer.service import DocumentAnalyzerService
 
 
 
@@ -19,6 +23,7 @@ router = APIRouter(
 )
 
 ingestion_service = DocumentIngestionService()
+analyzer_service = DocumentAnalyzerService()
 
 @router.get("")
 def list_documents(
@@ -125,6 +130,22 @@ async def upload_pdf(
         db.add(document)
         db.commit()
         db.refresh(document)
+        reader = PdfReader(
+            BytesIO(content)
+        )
+
+        text = ""
+
+        for page in reader.pages:
+            text += page.extract_text() or ""
+
+        analysis_result = analyzer_service.analyze(text)
+
+        analyzer_service.save_analysis(
+            db=db,
+            document_id=document.id,
+            result=analysis_result
+        )
 
         return {
             **result,

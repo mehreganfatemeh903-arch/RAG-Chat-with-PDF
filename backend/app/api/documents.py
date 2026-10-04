@@ -1,4 +1,6 @@
-﻿from pathlib import Path
+﻿import json
+from app.extraction.models import DocumentAnalysis
+from pathlib import Path
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -163,6 +165,34 @@ async def upload_pdf(
             status_code=500,
             detail=f"Document indexing failed: {exc}",
         ) from exc
+@router.get("/{document_id}/analysis")
+def get_document_analysis(
+    document_id: int,
+    db: Session = Depends(get_db),
+):
+    analysis = db.scalar(
+        select(DocumentAnalysis)
+        .where(
+            DocumentAnalysis.document_id == document_id
+        )
+        .order_by(DocumentAnalysis.id.desc())
+    )
+
+    if not analysis:
+        raise HTTPException(
+            status_code=404,
+            detail="Analysis not found",
+        )
+
+    return {
+        "id": analysis.id,
+        "document_id": analysis.document_id,
+        "document_type": analysis.document_type,
+        "confidence": analysis.confidence,
+        "analysis": json.loads(
+            analysis.extracted_data
+        ),
+    }
 
 
 

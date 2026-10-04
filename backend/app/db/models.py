@@ -65,6 +65,13 @@ class Document(Base):
         Integer,
         nullable=False,
     )
+    
+     
+    file_hash: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        index=True,
+    )
 
     page_count: Mapped[int] = mapped_column(
         Integer,

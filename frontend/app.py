@@ -76,9 +76,30 @@ with st.sidebar:
             st.error(f"Login failed: {exc}")
 
     if st.session_state.token:
-        st.info(
-            f"Logged in: {st.session_state.user_email}"
+        st.success(
+            "✅ Authenticated"
         )
+
+        st.markdown(
+            f"""
+            ### 👤 Profile
+            
+            **User:**  
+            {st.session_state.user_email}
+            
+            **Role:**  
+            Document Analyst
+            
+            **AI Access:**  
+            Enabled
+            """
+        )
+
+        if st.button("🚪 Logout"):
+            st.session_state.token = None
+            st.session_state.user_email = None
+            st.session_state.messages = []
+            st.rerun()
 
     st.divider()
 

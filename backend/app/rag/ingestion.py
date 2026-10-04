@@ -62,12 +62,12 @@ class DocumentIngestionService:
                 ]
             }
         )
-
     def ingest(
         self,
         file_path: str,
         document_id: str | None = None,
         user_id: int | None = None,
+        original_filename: str | None = None,
     ):
         path = Path(file_path)
 
@@ -117,7 +117,7 @@ class DocumentIngestionService:
                         metadata={
                             "document_id": document_id,
                             "user_id": user_id,
-                            "filename": path.name,
+                            "filename": original_filename or path.name,
                             "page_number": page_number,
                             "page_label": str(page_number),
                         },
@@ -158,7 +158,7 @@ class DocumentIngestionService:
                     {
                         "document_id": document_id,
                         "user_id": user_id,
-                        "filename": path.name,
+                        "filename": original_filename or path.name,
                         "page_number": node.metadata.get(
                             "page_number"
                         ),
@@ -192,7 +192,7 @@ class DocumentIngestionService:
         return {
             "document_id": document_id,
             "user_id": user_id,
-            "filename": path.name,
+            "filename": original_filename or path.name,
             "pages": len(reader.pages),
             "chunks": len(ids),
             "status": "indexed",

@@ -39,7 +39,8 @@ with st.sidebar:
             "📊 Dashboard",
             "📚 Documents",
             "📈 Analytics",
-            "⚙️ Settings"
+            "⚙️ Settings",
+            "🚀 Demo Center"
         ]
     )
 
@@ -439,6 +440,113 @@ elif page == "📈 Analytics":
         "Status",
         "Online"
     )
+
+
+elif page == "🚀 Demo Center":
+
+    st.title("🚀 AI Document Intelligence Platform")
+
+    st.subheader(
+        "Transform documents into instant business knowledge"
+    )
+
+    st.success(
+"""
+AI-powered document analysis platform
+
+✓ Understand PDFs automatically
+✓ Extract business information
+✓ Search thousands of pages
+✓ Generate verified answers
+✓ Protect sensitive documents
+"""
+    )
+
+    st.divider()
+
+    st.subheader(
+        "💼 Business Value"
+    )
+
+    a,b,c = st.columns(3)
+
+    a.metric(
+        "Review Time",
+        "-80%"
+    )
+
+    b.metric(
+        "Document Search",
+        "Seconds"
+    )
+
+    c.metric(
+        "Automation",
+        "AI Powered"
+    )
+
+
+    st.subheader(
+        "🏢 Industries"
+    )
+
+    st.write(
+"""
+🧾 Finance → Invoice Intelligence
+
+📑 Legal → Contract Analysis
+
+👤 HR → Resume Screening
+
+🏭 Operations → Document Automation
+
+🎧 Support → Knowledge Assistant
+"""
+    )
+
+
+    st.subheader(
+        "💎 Plans"
+    )
+
+    p1,p2,p3 = st.columns(3)
+
+    p1.info(
+"""
+Free
+
+Personal testing
+
+Limited documents
+"""
+    )
+
+    p2.success(
+"""
+Professional
+
+AI Workspace
+
+Business users
+"""
+    )
+
+    p3.warning(
+"""
+Enterprise
+
+Private AI
+
+Advanced Security
+"""
+    )
+
+
+    st.button(
+        "📩 Request Demo",
+        use_container_width=True
+    )
+
 
 
 elif page == "⚙️ Settings":

@@ -37,9 +37,7 @@ with st.sidebar:
             "📊 Dashboard",
             "📚 Documents",
             "📈 Analytics",
-            "⚙️ Settings",
-            "💬 Chat",
-            "📊 Dashboard"
+            "⚙️ Settings"
         ]
     )
 
@@ -203,33 +201,6 @@ if page == "📊 Dashboard":
     )
 
 
-
-
-if page == "📊 Dashboard":
-
-    st.title("📊 RAG Dashboard")
-
-    import os
-
-    pdfs = [
-        x for x in os.listdir("data/uploads")
-        if x.endswith(".pdf")
-    ]
-
-    c1,c2,c3,c4 = st.columns(4)
-
-    c1.metric("Documents",len(pdfs))
-    c2.metric("Vector DB","ChromaDB")
-    c3.metric("Embedding","ONNX")
-    c4.metric("LLM","Ollama")
-
-    st.divider()
-
-    st.success("RAG Pipeline Healthy")
-
-    st.write(
-        "Upload → Extract → Chunk → Embed → Retrieve → Generate"
-    )
 
 
 elif page == "📚 Documents":

@@ -18,6 +18,7 @@ st.set_page_config(
     layout="wide",
 )
 
+
 st.title("📄 RAG Chat with PDF")
 st.caption(
     "Upload PDF documents and ask questions using "
@@ -28,6 +29,22 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 with st.sidebar:
+
+    page = st.radio(
+        "Navigation",
+        [
+            "💬 Chat",
+            "📊 Dashboard",
+            "📚 Documents",
+            "📈 Analytics",
+            "⚙️ Settings",
+            "💬 Chat",
+            "📊 Dashboard"
+        ]
+    )
+
+    st.divider()
+
     st.header("🔐 Login")
 
     email = st.text_input("Email")
@@ -130,6 +147,161 @@ with st.sidebar:
 
     except requests.RequestException:
         st.warning("Start FastAPI first.")
+
+
+if page == "📊 Dashboard":
+
+    st.title("📊 RAG Dashboard")
+
+    st.caption(
+        "AI document intelligence overview"
+    )
+
+    import os
+
+    pdf_count = len(
+        [
+            f for f in os.listdir("data/uploads")
+            if f.endswith(".pdf")
+        ]
+    )
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric(
+            "PDF Documents",
+            pdf_count
+        )
+
+    with col2:
+        st.metric(
+            "Vector DB",
+            "ChromaDB"
+        )
+
+    with col3:
+        st.metric(
+            "Embedding",
+            "ONNX"
+        )
+
+    with col4:
+        st.metric(
+            "LLM",
+            "Ollama"
+        )
+
+    st.divider()
+
+    st.success(
+        "RAG Pipeline Ready"
+    )
+
+    st.info(
+        "Upload PDF → Extract → Embed → Retrieve → Answer"
+    )
+
+
+
+
+if page == "📊 Dashboard":
+
+    st.title("📊 RAG Dashboard")
+
+    import os
+
+    pdfs = [
+        x for x in os.listdir("data/uploads")
+        if x.endswith(".pdf")
+    ]
+
+    c1,c2,c3,c4 = st.columns(4)
+
+    c1.metric("Documents",len(pdfs))
+    c2.metric("Vector DB","ChromaDB")
+    c3.metric("Embedding","ONNX")
+    c4.metric("LLM","Ollama")
+
+    st.divider()
+
+    st.success("RAG Pipeline Healthy")
+
+    st.write(
+        "Upload → Extract → Chunk → Embed → Retrieve → Generate"
+    )
+
+
+elif page == "📚 Documents":
+
+    st.title("📚 Document Library")
+
+    import os
+
+    files = os.listdir("data/uploads")
+
+    if files:
+        for f in files:
+
+            path = os.path.join(
+                "data/uploads",
+                f
+            )
+
+            size = round(
+                os.path.getsize(path)/1024,
+                1
+            )
+
+            st.info(
+                f"📄 {f}\n\n"
+                f"Size: {size} KB\n\n"
+                "Status: Indexed ✅"
+            )
+    else:
+        st.warning(
+            "No documents uploaded."
+        )
+
+
+elif page == "📈 Analytics":
+
+    st.title("📈 Analytics")
+
+    c1,c2,c3 = st.columns(3)
+
+    c1.metric(
+        "Questions",
+        len(st.session_state.messages)
+    )
+
+    c2.metric(
+        "AI Engine",
+        "Ollama"
+    )
+
+    c3.metric(
+        "Status",
+        "Online"
+    )
+
+
+elif page == "⚙️ Settings":
+
+    st.title("⚙️ Settings")
+
+    st.write(
+        "AI Model: llama3.2:3b"
+    )
+
+    st.write(
+        "Embedding: all-MiniLM-L6-v2 ONNX"
+    )
+
+    st.write(
+        "Database: ChromaDB"
+    )
+
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):

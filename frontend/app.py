@@ -719,6 +719,70 @@ Support → Knowledge Assistant
 
 
 st.subheader(
+    "🧠 AI Document Analyzer"
+)
+
+d1, d2, d3 = st.columns(3)
+
+d1.metric(
+    "Document Type",
+    "Auto Detect"
+)
+
+d2.metric(
+    "Extraction",
+    "Ready"
+)
+
+d3.metric(
+    "AI Status",
+    "Active"
+)
+
+
+st.info(
+"""
+Supported Intelligence:
+
+🧾 Invoice Analyzer
+- Product extraction
+- Customer information
+- Amount detection
+
+
+📑 Contract Analyzer
+- Important clauses
+- Dates
+- Obligations
+
+
+👤 Resume Analyzer
+- Skills extraction
+- Experience summary
+
+
+📚 Knowledge Assistant
+- Multi document answers
+"""
+)
+
+
+st.subheader(
+    "⚡ AI Workflow"
+)
+
+st.write(
+"""
+Upload PDF
+→ Detect Type
+→ Extract Data
+→ Retrieve Knowledge
+→ Generate Verified Answer
+"""
+)
+
+
+st.subheader(
     "📊 Document Analysis"
 )
 

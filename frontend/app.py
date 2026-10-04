@@ -443,6 +443,74 @@ elif page == "📈 Analytics":
 
 elif page == "⚙️ Settings":
 
+    st.title("⚙️ Enterprise Workspace")
+
+    c1, c2, c3 = st.columns(3)
+
+    c1.metric(
+        "Workspace",
+        "Demo Organization"
+    )
+
+    c2.metric(
+        "Users",
+        "12"
+    )
+
+    c3.metric(
+        "Plan",
+        "Professional"
+    )
+
+    st.divider()
+
+    st.subheader(
+        "🏢 Organization"
+    )
+
+    st.info(
+"""
+Organization:
+AI Document Intelligence Team
+
+Role:
+Document Analyst
+
+Access:
+Full Document AI
+
+Security:
+Private Workspace
+"""
+    )
+
+    st.subheader(
+        "📊 Usage"
+    )
+
+    u1, u2, u3 = st.columns(3)
+
+    u1.metric(
+        "Documents",
+        "24"
+    )
+
+    u2.metric(
+        "AI Queries",
+        "156"
+    )
+
+    u3.metric(
+        "Storage",
+        "4.1 MB"
+    )
+
+    st.success(
+        "Enterprise workspace ready"
+    )
+
+
+
     st.title("⚙️ Settings")
 
     st.write(

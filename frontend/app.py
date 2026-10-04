@@ -226,11 +226,36 @@ if page == "📊 Dashboard":
 
 elif page == "📚 Documents":
 
-    st.title("📚 Document Library")
+    st.title("📚 Document Intelligence")
 
     import os
+    from datetime import datetime
 
-    files = os.listdir("data/uploads")
+    files = [
+        f for f in os.listdir("data/uploads")
+        if f.endswith(".pdf")
+    ]
+
+    total_size = sum(
+        os.path.getsize(
+            os.path.join("data/uploads", f)
+        )
+        for f in files
+    )
+
+    c1, c2 = st.columns(2)
+
+    c1.metric(
+        "PDF Documents",
+        len(files)
+    )
+
+    c2.metric(
+        "Storage Used",
+        f"{round(total_size / 1024, 1)} KB"
+    )
+
+    st.divider()
 
     if files:
         for f in files:
@@ -241,15 +266,37 @@ elif page == "📚 Documents":
             )
 
             size = round(
-                os.path.getsize(path)/1024,
+                os.path.getsize(path) / 1024,
                 1
             )
 
+            modified = datetime.fromtimestamp(
+                os.path.getmtime(path)
+            ).strftime("%Y-%m-%d %H:%M")
+
+            st.container()
+
             st.info(
-                f"📄 {f}\n\n"
-                f"Size: {size} KB\n\n"
-                "Status: Indexed ✅"
+                f"""
+📄 **{f}**
+
+Type:
+PDF Document
+
+Size:
+{size} KB
+
+Uploaded:
+{modified}
+
+Status:
+✅ Indexed
+
+AI Ready:
+✅ Yes
+"""
             )
+
     else:
         st.warning(
             "No documents uploaded."

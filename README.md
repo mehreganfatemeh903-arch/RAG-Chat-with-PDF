@@ -13,7 +13,7 @@ A Retrieval-Augmented Generation (RAG) application for uploading PDF documents, 
 - FastAPI backend
 - Streamlit frontend
 - OpenAI LLM support
-- Ollama local LLM support planned
+- Ollama local LLM support
 - Persian and English document/question support
 
 ## Architecture
@@ -61,7 +61,6 @@ RAG-Chat-with-PDF/
 - FastAPI
 - Uvicorn
 - ChromaDB
-- LlamaIndex
 - pypdf
 - Streamlit
 - OpenAI API or local LLM such as Ollama

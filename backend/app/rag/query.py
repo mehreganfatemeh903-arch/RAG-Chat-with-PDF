@@ -117,7 +117,7 @@ class RAGQueryService:
                 json={
                     "model": "llama3.2:3b",
                     "prompt": (
-                        "Answer the question using only the PDF context. "
+                        "You are a helpful RAG assistant. ""Answer only using the provided PDF context. ""Answer in the same language as the user question. ""Do not mix languages. "
                         "Give a short direct answer. "
                         "If missing, say not found.\n\n"
                         f"PDF context:\n{context}\n\n"

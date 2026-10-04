@@ -20,6 +20,10 @@ st.set_page_config(
 
 
 st.title("📄 RAG Chat with PDF")
+
+st.caption(
+    "Version 1.8.0 | Enterprise AI Document Intelligence Platform | Demo Ready 🚀"
+)
 st.caption(
     "AI-powered document analysis, semantic search and intelligent answers."
 )

@@ -1,0 +1,11 @@
+﻿RAG Chat with PDF - Test Document
+
+This is a test document for the RAG Chat with PDF project.
+
+The project uses FastAPI, LlamaIndex, ChromaDB, and local ONNX embeddings.
+
+RAG means Retrieval-Augmented Generation. It retrieves relevant information from documents before generating an answer.
+
+The local embedding model used in this project is all-MiniLM-L6-v2 through Chroma ONNX.
+
+This document is only a technical test for PDF ingestion and retrieval.

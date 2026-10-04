@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.env
+.idea/
+.vscode/
+.pytest_cache/
+*.log
+
+data/chroma/*
+!data/chroma/.gitkeep
+
+data/uploads/*
+!data/uploads/.gitkeep
+body.json
+login.json
+
+# Temporary files
+*.bak
+*.tmp
+data/*.db

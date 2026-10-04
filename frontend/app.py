@@ -88,6 +88,9 @@ with st.sidebar:
                         "application/pdf",
                     )
                 },
+                headers={
+                    "Authorization": f"Bearer {st.session_state.token}"
+                },
                 timeout=300,
             )
 

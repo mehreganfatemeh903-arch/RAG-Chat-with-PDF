@@ -627,6 +627,69 @@ with x2:
 
 
 st.subheader(
+    "📄 AI Report Generator"
+)
+
+r1, r2, r3 = st.columns(3)
+
+with r1:
+    st.metric(
+        "Report Type",
+        "AI Summary"
+    )
+
+with r2:
+    st.metric(
+        "Format",
+        "PDF Ready"
+    )
+
+with r3:
+    st.metric(
+        "Status",
+        "Generated"
+    )
+
+
+st.success(
+"""
+📄 Report Preview
+
+Document:
+AI analyzed PDF
+
+Sections:
+
+✓ Executive Summary
+
+✓ Extracted Information
+
+✓ Key Entities
+
+✓ Source References
+
+✓ AI Confidence Score
+"""
+)
+
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.button(
+        "📥 Download Report",
+        use_container_width=True
+    )
+
+with col2:
+    st.button(
+        "📝 Generate Summary",
+        use_container_width=True
+    )
+
+
+
+st.subheader(
     "📄 Report Center"
 )
 

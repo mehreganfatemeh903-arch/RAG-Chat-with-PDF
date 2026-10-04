@@ -5,11 +5,11 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from backend.app.core.config import settings
-from backend.app.core.dependencies import get_current_user
-from backend.app.db.models import User, Document
-from backend.app.db.session import get_db
-from backend.app.rag.ingestion import DocumentIngestionService
+from app.core.config import settings
+from app.core.dependencies import get_current_user
+from app.db.models import User, Document
+from app.db.session import get_db
+from app.rag.ingestion import DocumentIngestionService
 
 
 

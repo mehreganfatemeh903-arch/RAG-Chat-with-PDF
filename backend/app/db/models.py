@@ -1,11 +1,14 @@
-from datetime import datetime, timezone
+﻿from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, String
+from sqlalchemy import Boolean, DateTime, String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.db.base import Base
+from app.db.base import Base
 
-
+from app.organizations.models import Organization
+from app.workspace.models import Workspace
+from app.extraction.models import DocumentAnalysis
+from app.audit.models import AuditLog
 class User(Base):
     __tablename__ = 'users'
 
@@ -23,7 +26,7 @@ from datetime import datetime, timezone
 from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.db.base import Base
+from app.db.base import Base
 
 
 class Document(Base):

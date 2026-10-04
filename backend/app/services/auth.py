@@ -3,9 +3,9 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from backend.app.core.jwt import create_access_token
-from backend.app.core.security import hash_password, verify_password
-from backend.app.db.models import User
+from app.core.jwt import create_access_token
+from app.core.security import hash_password, verify_password
+from app.db.models import User
 
 
 class AuthService:

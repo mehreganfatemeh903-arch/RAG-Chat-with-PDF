@@ -14,7 +14,7 @@ from llama_index.core.embeddings import BaseEmbedding
 from llama_index.core.node_parser import SentenceSplitter
 from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
 
-from backend.app.core.config import settings
+from app.core.config import settings
 
 
 class ChromaONNXEmbedding(BaseEmbedding):

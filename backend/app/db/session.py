@@ -1,9 +1,9 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.app.core.config import settings
+from app.core.config import settings
 
 
 DATABASE_URL = 'sqlite:///' + str(Path(settings.upload_dir).resolve().parent / 'app.db')

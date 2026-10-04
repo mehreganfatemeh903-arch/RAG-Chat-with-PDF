@@ -2,16 +2,16 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from backend.app.api.schemas import (
+from app.api.schemas import (
     LoginRequest,
     RegisterRequest,
     TokenResponse,
     UserResponse,
 )
-from backend.app.core.dependencies import get_current_user
-from backend.app.db.models import User
-from backend.app.db.session import get_db
-from backend.app.services.auth import AuthService
+from app.core.dependencies import get_current_user
+from app.db.models import User
+from app.db.session import get_db
+from app.services.auth import AuthService
 
 
 router = APIRouter(

@@ -5,8 +5,8 @@ import requests
 from fastapi import HTTPException
 from openai import OpenAI
 
-from backend.app.rag.ingestion import ChromaONNXEmbedding
-from backend.app.core.config import settings
+from app.rag.ingestion import ChromaONNXEmbedding
+from app.core.config import settings
 
 
 class RAGQueryService:

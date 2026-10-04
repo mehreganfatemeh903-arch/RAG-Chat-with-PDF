@@ -1,3 +1,6 @@
+import json
+from sqlalchemy import select
+from app.extraction.models import DocumentAnalysis
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -73,4 +76,33 @@ async def analyze_document(
         "document_id": document.id,
         "filename": file.filename,
         "result": result
+    }
+@router.get("/{document_id}")
+def get_analysis(
+    document_id: int,
+    db: Session = Depends(get_db)
+):
+
+    analysis = db.scalar(
+        select(DocumentAnalysis)
+        .where(
+            DocumentAnalysis.document_id == document_id
+        )
+        .order_by(DocumentAnalysis.id.desc())
+    )
+
+    if not analysis:
+        raise HTTPException(
+            status_code=404,
+            detail="Analysis not found"
+        )
+
+    return {
+        "id": analysis.id,
+        "document_id": analysis.document_id,
+        "document_type": analysis.document_type,
+        "confidence": analysis.confidence,
+        "analysis": json.loads(
+            analysis.extracted_data
+        )
     }

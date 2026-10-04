@@ -117,6 +117,7 @@ async def upload_pdf(
             str(file_path),
             document_id=document_id,
             user_id=current_user.id,
+            original_filename=original_filename,
         )
 
         document = Document(

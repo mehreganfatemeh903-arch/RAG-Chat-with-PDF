@@ -97,7 +97,7 @@ The response contains the answer and retrieved sources.
 
 1. Upload PDF.
 2. Extract text with pypdf.
-3. Create LlamaIndex documents.
+3. Create document chunks.
 4. Split text into chunks.
 5. Generate local embeddings.
 6. Store embeddings in ChromaDB.
@@ -122,7 +122,7 @@ Health test: passed
 
 OpenAI configuration is detected, but the current OpenAI account has no remaining API credit.
 
-Ollama is planned as the local LLM option.
+Ollama is supported as the local LLM option.
 
 ## Testing
 

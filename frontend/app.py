@@ -595,6 +595,130 @@ for i, item in enumerate(suggestions):
 
 
 st.subheader(
+    "🧠 AI Document Intelligence"
+)
+
+x1, x2 = st.columns(2)
+
+with x1:
+    st.success(
+        """
+📝 Smart Summary
+
+✓ Document type detection
+✓ Main topics extraction
+✓ Important entities
+✓ Key information
+"""
+    )
+
+with x2:
+    st.info(
+        """
+📌 Data Extraction
+
+✓ Products
+✓ Customers
+✓ Prices
+✓ Dates
+✓ Reference numbers
+"""
+    )
+
+
+st.subheader(
+    "📄 Report Center"
+)
+
+r1, r2, r3 = st.columns(3)
+
+r1.button(
+    "📄 Generate AI Report",
+    use_container_width=True
+)
+
+r2.button(
+    "⬇️ Export Summary",
+    use_container_width=True
+)
+
+r3.button(
+    "🔍 Analyze Document",
+    use_container_width=True
+)
+
+
+st.subheader(
+    "📂 Document Categories"
+)
+
+c1,c2,c3,c4 = st.columns(4)
+
+c1.metric("Invoices","12")
+c2.metric("Contracts","5")
+c3.metric("Reports","7")
+c4.metric("HR Files","3")
+
+
+st.subheader(
+    "📈 AI Performance"
+)
+
+a,b,c = st.columns(3)
+
+a.metric(
+    "Documents Processed",
+    "24"
+)
+
+b.metric(
+    "AI Answers",
+    len(st.session_state.messages)
+)
+
+c.metric(
+    "Accuracy",
+    "High"
+)
+
+
+st.subheader(
+    "🔐 Enterprise Security"
+)
+
+st.success(
+    """
+✓ JWT Authentication
+
+✓ Private Document Processing
+
+✓ Source Verified Answers
+
+✓ Local AI Support
+"""
+)
+
+
+st.subheader(
+    "🏢 Business Solutions"
+)
+
+st.write(
+    """
+Finance → Invoice Intelligence
+
+Legal → Contract Search
+
+HR → Resume Analysis
+
+Operations → Document Automation
+
+Support → Knowledge Assistant
+"""
+)
+
+
+st.subheader(
     "📊 Document Analysis"
 )
 

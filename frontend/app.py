@@ -6,6 +6,12 @@ SESSION.trust_env = False
 
 API_URL = "http://127.0.0.1:8000"
 
+if "token" not in st.session_state:
+    st.session_state.token = None
+
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
+
 st.set_page_config(
     page_title="RAG Chat with PDF",
     page_icon="📄",
@@ -22,6 +28,45 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 with st.sidebar:
+    st.header("🔐 Login")
+
+    email = st.text_input("Email")
+    password = st.text_input(
+        "Password",
+        type="password"
+    )
+
+    if st.button("Login"):
+        try:
+            response = SESSION.post(
+                f"{API_URL}/auth/login",
+                json={
+                    "email": email,
+                    "password": password,
+                },
+                timeout=30,
+            )
+
+            if response.ok:
+                data = response.json()
+                st.session_state.token = data.get(
+                    "access_token"
+                )
+                st.session_state.user_email = email
+                st.success("Login successful")
+            else:
+                st.error(response.text)
+
+        except requests.RequestException as exc:
+            st.error(f"Login failed: {exc}")
+
+    if st.session_state.token:
+        st.info(
+            f"Logged in: {st.session_state.user_email}"
+        )
+
+    st.divider()
+
     st.header("📄 Documents")
 
     uploaded_file = st.file_uploader(
@@ -133,6 +178,9 @@ if question:
                 response = SESSION.post(
                     f"{API_URL}/chat",
                     json={"question": question},
+                    headers={
+                        "Authorization": f"Bearer {st.session_state.token}"
+                    },
                     timeout=300,
                 )
 

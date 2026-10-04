@@ -100,6 +100,13 @@ class RAGQueryService:
             for item in sources
         )
 
+        context = (
+            context
+            .replace("â", "")
+            .replace("�", "")
+            .strip()
+        )
+
         answer = None
 
         try:
@@ -168,7 +175,14 @@ class RAGQueryService:
                     + context[:2000]
                 )
 
+        source_text = "\n\nSources:\n"
+        for source in sources:
+            source_text += (
+                f"- {source.get('filename', 'Unknown')}"
+                f" | Page: {source.get('page', 'Unknown')}\n"
+            )
+
         return {
-            "answer": answer,
+            "answer": answer + source_text,
             "sources": sources,
         }

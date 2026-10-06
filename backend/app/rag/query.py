@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from openai import OpenAI
 
 from app.rag.ingestion import ChromaONNXEmbedding
+from app.rag.invoice_extractor import extract_invoice_fields
 from app.core.config import settings
 
 
@@ -29,7 +30,12 @@ class RAGQueryService:
             name="documents"
         )
 
-        if collection.count() == 0:
+        user_documents = collection.get(
+            where={"user_id": user_id},
+            include=["metadatas"],
+        )
+
+        if not user_documents.get("metadatas"):
             raise HTTPException(
                 status_code=404,
                 detail="No indexed documents found.",
@@ -53,23 +59,6 @@ class RAGQueryService:
         documents = results.get("documents", [[]])[0]
         metadatas = results.get("metadatas", [[]])[0]
         distances = results.get("distances", [[]])[0]
-
-        # For small PDFs, use full retrieved content instead of a partial chunk
-        if documents and len(documents) == 1:
-            all_results = collection.get(
-                where={
-                    "user_id": user_id
-                },
-                include=[
-                    "documents",
-                    "metadatas",
-                ],
-            )
-
-            if all_results.get("documents"):
-                documents = all_results["documents"]
-                metadatas = all_results["metadatas"]
-                distances = [0] * len(documents)
 
         if not documents:
             return {
@@ -110,14 +99,16 @@ class RAGQueryService:
         answer = None
 
         try:
-            import requests
-
             ollama_response = requests.post(
                 "http://localhost:11434/api/generate",
                 json={
                     "model": "llama3.2:3b",
                     "prompt": (
-                        "You are a helpful RAG assistant. ""Answer only using the provided PDF context. ""Answer in the same language as the user question. ""Do not mix languages. "
+                        "You are a strict document assistant. "
+                        "Answer only using the provided PDF context. "
+                        "Never guess, infer, invent, or substitute values. "
+                        "Answer in the same language as the user question. "
+                        "Do not mix languages. "
                         "Give a short direct answer. "
                         "If missing, say not found.\n\n"
                         f"PDF context:\n{context}\n\n"
@@ -134,48 +125,56 @@ class RAGQueryService:
             print("OLLAMA ERROR:", e)
             answer = None
 
-        # Keep LLM answer if available
+        import re
+
+        q = question.lower()
+
+        order_match = re.search(
+            r"Order\s+Number\s*:\s*([^\s]+)",
+            context,
+            re.IGNORECASE,
+        )
+
+        invoice_fields = extract_invoice_fields(context)
+        total_match = invoice_fields.get("total")
+
+        wants_total = any(
+            key in q
+            for key in [
+                "total",
+                "amount",
+                "مبلغ",
+                "جمع",
+                "کل",
+            ]
+        )
+
+        wants_order = (
+            "order number" in q
+            or "شماره سفارش" in q
+        )
+
+        if wants_total or wants_order:
+            parts = []
+
+            if wants_order and order_match:
+                parts.append(
+                    f"شماره سفارش: {order_match.group(1)}"
+                )
+
+            if wants_total and total_match:
+                parts.append(
+                    f"مبلغ کل: {total_match}"
+                )
+
+            if parts:
+                answer = "\n".join(parts)
 
         if not answer:
-            import re
-
-            lines = [
-                line.strip()
-                for line in context.splitlines()
-                if line.strip()
-            ]
-
-            extracted = []
-
-            for line in lines:
-                lower = line.lower()
-
-                if any(
-                    key in lower
-                    for key in [
-                        "order number",
-                        "order date",
-                        "total",
-                        "amount",
-                        "price",
-                        "nikon",
-                        "invoice",
-                    ]
-                ):
-                    extracted.append(line)
-
-            if extracted:
-                answer = (
-                    "Answer from PDF:\n\n"
-                    + "\n".join(extracted[:10])
-                )
-            else:
-                answer = (
-                    "Relevant text from PDF:\n\n"
-                    + context[:2000]
-                )
+            answer = "No relevant information found."
 
         source_text = "\n\nSources:\n"
+
         for source in sources:
             source_text += (
                 f"- {source.get('filename', 'Unknown')}"
@@ -186,3 +185,13 @@ class RAGQueryService:
             "answer": answer + source_text,
             "sources": sources,
         }
+
+
+
+
+
+
+
+
+
+

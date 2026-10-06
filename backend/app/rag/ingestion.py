@@ -5,8 +5,6 @@ from uuid import uuid4
 from pdf2image import convert_from_path
 import pytesseract
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
 import chromadb
 from pypdf import PdfReader
 from llama_index.core import Document
@@ -15,6 +13,11 @@ from llama_index.core.node_parser import SentenceSplitter
 from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
 
 from app.core.config import settings
+from app.rag.invoice_extractor import extract_invoice_fields
+
+
+if settings.tesseract_cmd:
+    pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
 
 
 class ChromaONNXEmbedding(BaseEmbedding):
@@ -62,6 +65,7 @@ class DocumentIngestionService:
                 ]
             }
         )
+
     def ingest(
         self,
         file_path: str,
@@ -84,31 +88,29 @@ class DocumentIngestionService:
         document_id = document_id or str(uuid4())
 
         reader = PdfReader(str(path))
-
         documents = []
 
         for page_number, page in enumerate(
             reader.pages,
             start=1,
         ):
-            text = ""
-
-            images = convert_from_path(
-                str(path),
-                first_page=page_number,
-                last_page=page_number,
-                poppler_path=r"C:/poppler/poppler-26.09.0/Library/bin",
-                dpi=300,
-            )
-
-            text = pytesseract.image_to_string(
-                images[0],
-                lang="fas+eng",
-                config="--psm 6",
-            )
+            text = page.extract_text() or ""
 
             if not text.strip():
-                text = page.extract_text() or ""
+                images = convert_from_path(
+                    str(path),
+                    first_page=page_number,
+                    last_page=page_number,
+                    poppler_path=settings.poppler_path or None,
+                    dpi=300,
+                )
+
+                if images:
+                    text = pytesseract.image_to_string(
+                        images[0],
+                        lang="fas+eng",
+                        config="--psm 11",
+                    )
 
             if text.strip():
                 documents.append(
@@ -129,9 +131,15 @@ class DocumentIngestionService:
                 "No extractable text found in PDF."
             )
 
+        extracted_fields = extract_invoice_fields(
+            (chr(10) + chr(10)).join(
+                doc.text for doc in documents
+            )
+        )
+
         splitter = SentenceSplitter(
-            chunk_size=800,
-            chunk_overlap=120,
+            chunk_size=settings.chunk_size,
+            chunk_overlap=settings.chunk_overlap,
         )
 
         ids = []
@@ -151,7 +159,6 @@ class DocumentIngestionService:
                     continue
 
                 ids.append(str(uuid4()))
-
                 texts.append(text)
 
                 metadatas.append(
@@ -169,9 +176,7 @@ class DocumentIngestionService:
                 )
 
                 embeddings.append(
-                    self.embedding.get_text_embedding(
-                        text
-                    )
+                    self.embedding.get_text_embedding(text)
                 )
 
         client = chromadb.PersistentClient(
@@ -196,4 +201,5 @@ class DocumentIngestionService:
             "pages": len(reader.pages),
             "chunks": len(ids),
             "status": "indexed",
+            "extracted_fields": extracted_fields,
         }

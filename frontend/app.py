@@ -4,7 +4,7 @@ import streamlit as st
 SESSION = requests.Session()
 SESSION.trust_env = False
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = "http://127.0.0.1:8001"
 
 if "token" not in st.session_state:
     st.session_state.token = None
@@ -118,12 +118,12 @@ with st.sidebar:
     )
 
     if uploaded_file and st.button(
-        "Index PDF",
+        "🤖 Analyze PDF",
         use_container_width=True,
     ):
         try:
             response = SESSION.post(
-                f"{API_URL}/documents/upload",
+                f"{API_URL}/analyzer/analyze",
                 files={
                     "file": (
                         uploaded_file.name,
@@ -144,12 +144,95 @@ with st.sidebar:
                     f"Indexed: {result.get('filename')}"
                 )
 
-                st.json(result)
+                analysis = result.get("result", {}).get("analysis", {})
+                fields = analysis.get("fields", {})
+
+                st.subheader("🧾 Invoice Intelligence")
+
+                col1, col2, col3 = st.columns(3)
+
+                col1.metric(
+                    "Order Number",
+                    fields.get("order_number") or "Not found"
+                )
+
+                col2.metric(
+                    "Total",
+                    fields.get("total") or "Not found"
+                )
+
+                col3.metric(
+                    "Confidence",
+                    f"{result.get('result', {}).get('detection', {}).get('confidence', 0) * 100:.0f}%"
+                )
+
+                st.write(
+                    f"**Item:** {fields.get('item') or 'Not found'}"
+                )
+
+                st.write(
+                    f"**Order Date:** {fields.get('order_date') or 'Not found'}"
+                )
+
+                st.write(
+                    f"**Customer:** {fields.get('customer_email') or 'Not found'}"
+                )
+
+                st.write(
+                    f"**Phone:** {fields.get('customer_phone') or 'Not found'}"
+                )
+
+                st.write(
+                    f"**Shipping:** {fields.get('shipping_method') or 'Not found'}"
+                )
             else:
                 st.error(response.text)
 
         except requests.RequestException as exc:
             st.error(f"Backend connection failed: {exc}")
+
+    st.divider()
+
+    st.subheader("📚 Your Documents")
+
+    try:
+        documents_response = SESSION.get(
+            f"{API_URL}/documents",
+            headers={
+                "Authorization": f"Bearer {st.session_state.token}"
+            },
+            timeout=10,
+        )
+
+        if documents_response.ok:
+            documents = documents_response.json()
+
+            if documents:
+                for document in documents:
+                    with st.container(border=True):
+                        col1, col2, col3 = st.columns([4, 2, 1])
+
+                        with col1:
+                            st.write(
+                                f"📄 **{document.get('filename', 'Unknown')}**"
+                            )
+
+                        with col2:
+                            st.caption(
+                                f"Status: {document.get('status', 'Unknown')}"
+                            )
+
+                        with col3:
+                            st.caption(
+                                f"Pages: {document.get('page_count', '-')}"
+                            )
+            else:
+                st.info("No documents found.")
+        else:
+            st.warning("Could not load documents.")
+
+    except requests.RequestException:
+        st.warning("Could not connect to documents API.")
 
     st.divider()
 
@@ -1127,3 +1210,9 @@ if question:
                 st.error(
                     f"Backend connection failed: {exc}"
                 )
+
+
+
+
+
+

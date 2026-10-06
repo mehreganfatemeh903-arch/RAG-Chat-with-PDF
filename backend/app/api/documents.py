@@ -1,7 +1,8 @@
 ﻿import json
-from app.extraction.models import DocumentAnalysis
+import hashlib
 from pathlib import Path
 from uuid import uuid4
+from io import BytesIO
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import select
@@ -11,12 +12,10 @@ from app.core.config import settings
 from app.core.dependencies import get_current_user
 from app.db.models import User, Document
 from app.db.session import get_db
+from app.extraction.models import DocumentAnalysis
 from app.rag.ingestion import DocumentIngestionService
-from io import BytesIO
-from pypdf import PdfReader
-
 from app.analyzer.service import DocumentAnalyzerService
-
+from pypdf import PdfReader
 
 
 router = APIRouter(
@@ -26,6 +25,7 @@ router = APIRouter(
 
 ingestion_service = DocumentIngestionService()
 analyzer_service = DocumentAnalyzerService()
+
 
 @router.get("")
 def list_documents(
@@ -55,7 +55,10 @@ async def delete_document(
     )
 
     if not document:
-        raise HTTPException(status_code=404, detail="Document not found.")
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found.",
+        )
 
     file_path = Path(settings.upload_dir) / document.stored_filename
 
@@ -73,6 +76,7 @@ async def delete_document(
         "status": "deleted",
         "document_id": document_id,
     }
+
 
 @router.post("/upload")
 async def upload_pdf(
@@ -93,6 +97,8 @@ async def upload_pdf(
         )
 
     content = await file.read()
+
+    file_hash = hashlib.sha256(content).hexdigest()
 
     max_size = settings.max_file_size_mb * 1024 * 1024
 
@@ -125,6 +131,7 @@ async def upload_pdf(
             document_id=document_id,
             filename=original_filename,
             stored_filename=stored_filename,
+            file_hash=file_hash,
             file_size=len(content),
             page_count=result["pages"],
             status="indexed",
@@ -133,9 +140,8 @@ async def upload_pdf(
         db.add(document)
         db.commit()
         db.refresh(document)
-        reader = PdfReader(
-            BytesIO(content)
-        )
+
+        reader = PdfReader(BytesIO(content))
 
         text = ""
 
@@ -144,10 +150,13 @@ async def upload_pdf(
 
         analysis_result = analyzer_service.analyze(text)
 
+        if result.get("extracted_fields"):
+            analysis_result["analysis"]["fields"] = result["extracted_fields"]
+
         analyzer_service.save_analysis(
             db=db,
             document_id=document.id,
-            result=analysis_result
+            result=analysis_result,
         )
 
         return {
@@ -160,21 +169,46 @@ async def upload_pdf(
 
     except Exception as exc:
         db.rollback()
+
+        try:
+            ingestion_service.delete_document(
+                document_id=document_id,
+                user_id=current_user.id,
+            )
+        except Exception:
+            pass
+
         file_path.unlink(missing_ok=True)
 
         raise HTTPException(
             status_code=500,
             detail=f"Document indexing failed: {exc}",
         ) from exc
+
+
 @router.get("/{document_id}/analysis")
 def get_document_analysis(
     document_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    document = db.scalar(
+        select(Document).where(
+            Document.id == document_id,
+            Document.user_id == current_user.id,
+        )
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found",
+        )
+
     analysis = db.scalar(
         select(DocumentAnalysis)
         .where(
-            DocumentAnalysis.document_id == document_id
+            DocumentAnalysis.document_id == document.id
         )
         .order_by(DocumentAnalysis.id.desc())
     )
@@ -190,10 +224,5 @@ def get_document_analysis(
         "document_id": analysis.document_id,
         "document_type": analysis.document_type,
         "confidence": analysis.confidence,
-        "analysis": json.loads(
-            analysis.extracted_data
-        ),
+        "analysis": json.loads(analysis.extracted_data),
     }
-
-
-

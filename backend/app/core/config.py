@@ -1,7 +1,5 @@
 ﻿from pathlib import Path
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 BASE_DIR = Path(__file__).resolve().parents[3]
 
@@ -13,6 +11,7 @@ class Settings(BaseSettings):
 
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
+
     embedding_model: str = "text-embedding-3-small"
 
     chroma_path: str = "./data/chroma"
@@ -24,8 +23,12 @@ class Settings(BaseSettings):
     jwt_secret_key: str = ""
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
+
     chunk_size: int = 800
     chunk_overlap: int = 120
+
+    tesseract_cmd: str = ""
+    poppler_path: str = ""
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
@@ -36,5 +39,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
-

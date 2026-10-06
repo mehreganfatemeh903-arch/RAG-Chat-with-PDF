@@ -1,4 +1,4 @@
-from typing import Dict
+﻿from typing import Dict
 import re
 
 
@@ -29,7 +29,6 @@ class ContractAnalyzer:
             ]
         }
 
-
         for name, words in keywords.items():
 
             found = []
@@ -40,14 +39,12 @@ class ContractAnalyzer:
 
             fields[name] = found
 
-
         dates = re.findall(
             r"\d{4}[-/]\d{2}[-/]\d{2}",
             text
         )
 
         fields["dates"] = dates
-
 
         return {
             "document_type": "contract",

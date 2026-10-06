@@ -1,4 +1,4 @@
-from typing import Dict
+﻿from typing import Dict
 import re
 
 
@@ -32,7 +32,6 @@ class ResumeAnalyzer:
             ],
         }
 
-
         text_lower = text.lower()
 
         for section, keywords in sections.items():
@@ -45,7 +44,6 @@ class ResumeAnalyzer:
 
             fields[section] = matched
 
-
         emails = re.findall(
             r'[\w\.-]+@[\w\.-]+\.\w+',
             text
@@ -54,7 +52,6 @@ class ResumeAnalyzer:
         if emails:
             fields["email"] = emails[0]
 
-
         phones = re.findall(
             r'\+?\d[\d\s\-]{8,}',
             text
@@ -62,7 +59,6 @@ class ResumeAnalyzer:
 
         if phones:
             fields["phone"] = phones[0]
-
 
         return {
             "document_type": "resume",
